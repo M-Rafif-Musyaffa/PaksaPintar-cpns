@@ -13,7 +13,7 @@ Anda **TIDAK BISA** menutup aplikasinya sebelum menjawab soal tersebut! 💀
 
 ## 📸 Preview Aplikasi
 
-> **Catatan Developer:** *Simpan hasil screenshot aplikasimu ke dalam folder proyek, lalu ganti teks `[Masukkan link/path gambar di sini]` dengan nama file gambarmu, misalnya `docs/ss-setting.png`.*
+> **Catatan Developer:** *Simpan hasil screenshot aplikasimu ke dalam folder proyek, lalu ganti teks `[Masukkan link/path gambar di sini]` dengan nama file gambarmu, misalnya `docs/setting.png`.*
 
 ### 1. Menu Pengaturan (Neo-Brutalism UI)
 ![Tampilan Menu Setting]([Masukkan link/path gambar di sini])
