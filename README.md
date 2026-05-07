@@ -12,23 +12,20 @@ Anda **TIDAK BISA** menutup aplikasinya sebelum menjawab soal tersebut! 💀
 ---
 
 ## 📸 Preview Aplikasi
-
-> **Catatan Developer:** *Simpan hasil screenshot aplikasimu ke dalam folder proyek, lalu ganti teks `[Masukkan link/path gambar di sini]` dengan nama file gambarmu, misalnya `docs/setting.png`.*
-
 ### 1. Menu Pengaturan (Neo-Brutalism UI)
-![Tampilan Menu Setting]([Masukkan link/path gambar di sini])
+![Tampilan Menu Setting](docs/setting.png)<br>
 *Antarmuka pengaturan yang tegas, menampilkan statistik soal dan kontrol interval waktu munculnya pop-up.*
 
 ### 2. Interupsi Soal Secara Tiba-Tiba
-![Tampilan Pop-up Soal]([Masukkan link/path gambar di sini])
+![Tampilan Pop-up Soal](docs/soal.png)<br>
 *Soal akan muncul memaksa di atas semua aplikasi (Always-on-top).*
 
 ### 3. Hukuman Brutal (Cooldown Penalty)
-![Tampilan Hukuman]([Masukkan link/path gambar di sini])
+![Tampilan Hukuman](docs/salah.png)<br>
 *Jika menjawab salah, tombol tutup akan dikunci selama 15 detik. Memaksa pengguna membaca pembahasan.*
 
 ### 4. Rapor Evaluasi Akhir Sesi
-![Tampilan Rapor Akhir]([Masukkan link/path gambar di sini])
+![Tampilan Rapor Akhir](docs/hasil.png)<br>
 *Menampilkan log soal mana saja yang dijawab salah sebagai bahan evaluasi sebelum aplikasi dimatikan sepenuhnya.*
 
 ---
