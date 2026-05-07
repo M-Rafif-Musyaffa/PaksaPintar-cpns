@@ -43,7 +43,7 @@ Pastikan sistem Anda telah terinstal `Node.js`, `Rust`, dan `C++ Build Tools` (W
 
 1. Clone repositori ini:
    ```bash
-   git clone [[https://github.com/USERNAME_KAMU/paksapintar-cpns.git](https://github.com/USERNAME_KAMU/paksapintar-cpns.git)](https://github.com/M-Rafif-Musyaffa/PaksaPintar-cpns.git)
+   [git clone [[https://github.com/USERNAME_KAMU/paksapintar-cpns.git](https://github.com/USERNAME_KAMU/paksapintar-cpns.git)](https://github.com/M-Rafif-Musyaffa/PaksaPintar-cpns.git)](https://github.com/M-Rafif-Musyaffa/PaksaPintar-cpns.git)
    ```
 2. Masuk ke direktori proyek:
  ```bash
