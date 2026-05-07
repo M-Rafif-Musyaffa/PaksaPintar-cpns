@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "kategori": "TIU",
+    "pertanyaan": "Jika 'Ekonomi' berhubungan dengan 'Inflasi' seperti 'Kesehatan' berhubungan dengan..., maka pasangan yang paling tepat adalah...",
+    "pilihan": ["A. Obat", "B. Pandemi", "C. Vaksin", "D. Rumah Sakit"],
+    "jawaban_benar": "B",
+    "pembahasan": "Hubungan sebab-akibat atau fenomena negatif yang memengaruhi bidang tersebut. Inflasi adalah masalah ekonomi, pandemi adalah masalah kesehatan (HOTS: analogi relasional tingkat tinggi)."
+  },
+  {
+    "id": 2,
+    "kategori": "TIU",
+    "pertanyaan": "Suatu tim proyek memiliki anggota A, B, C, D. Efisiensi tim meningkat 20% jika A dan B bekerja bersama, menurun 15% jika C bergabung, dan netral jika D ikut. Untuk proyek mendesak dengan target efisiensi maksimal, komposisi tim terbaik adalah...",
+    "pilihan": ["A. A, B, D", "B. A, B, C", "C. Semua anggota", "D. Hanya A dan B"],
+    "jawaban_benar": "A",
+    "pembahasan": "Menganalisis kombinasi untuk hasil optimal berdasarkan data efisiensi (HOTS: analisis kuantitatif dan pengambilan keputusan)."
+  }
+]
