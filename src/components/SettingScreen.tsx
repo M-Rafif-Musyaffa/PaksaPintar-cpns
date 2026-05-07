@@ -19,7 +19,6 @@ export default function SettingScreen({ onMulai }: { onMulai: () => void }) {
   const countTWK = allSoal.filter(s => s.kategori.toUpperCase().includes('TWK')).length;
   const countTIU = allSoal.filter(s => s.kategori.toUpperCase().includes('TIU')).length;
   const countTKP = allSoal.filter(s => s.kategori.toUpperCase().includes('TKP')).length;
-  const countTotal = allSoal.length;
 
   useEffect(() => {
     const presetValues = [10000, 60000, 3600000, 18000000];
