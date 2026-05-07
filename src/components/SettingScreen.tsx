@@ -19,7 +19,6 @@ export default function SettingScreen({ onMulai }: { onMulai: () => void }) {
   const countTWK = allSoal.filter(s => s.kategori.toUpperCase().includes('TWK')).length;
   const countTIU = allSoal.filter(s => s.kategori.toUpperCase().includes('TIU')).length;
   const countTKP = allSoal.filter(s => s.kategori.toUpperCase().includes('TKP')).length;
-  const countTotal = allSoal.length;
 
   useEffect(() => {
     const presetValues = [10000, 60000, 3600000, 18000000];
@@ -62,9 +61,11 @@ export default function SettingScreen({ onMulai }: { onMulai: () => void }) {
         const jsonTeks = event.target?.result as string;
         const dataBaru = JSON.parse(jsonTeks);
         
-        if (Array.isArray(dataBaru) && dataBaru.length > 0 && dataBaru[0].pertanyaan) {
+        if (Array.isArray(dataBaru) && dataBaru.length > 0 && dataBaru[0].pertanyaan) {       
           importSoalBaru(dataBaru);
-          alert(`✅ BERHASIL! ${dataBaru.length} soal baru ditambahkan.`);
+          setTimeout(() => {
+            alert(`✅ PROSES SELESAI!\nSistem memfilter soal duplikat secara otomatis. Cek jumlah total soalmu sekarang.`);
+          }, 100);
         } else {
           alert("💀 GAGAL! Format JSON salah.");
         }

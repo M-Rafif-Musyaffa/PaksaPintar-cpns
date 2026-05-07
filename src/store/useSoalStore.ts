@@ -74,7 +74,19 @@ export const useSoalStore = create<SoalState>()(
       },
 
       importSoalBaru: (soalBaru: Soal[]) => {
-        set((state) => ({ customSoal: [...state.customSoal, ...soalBaru] }));
+       set((state) => {
+          const pertanyaanSudahAda = new Set(
+            [...dataSoalBawaan, ...state.customSoal].map(s => 
+              s.pertanyaan.trim().toLowerCase() 
+            )
+          );
+          const soalUnik = soalBaru.filter(soal => 
+            !pertanyaanSudahAda.has(soal.pertanyaan.trim().toLowerCase())
+          );
+          return {
+            customSoal: [...state.customSoal, ...soalUnik]
+          };
+        });
       },
 
       initSoal: () => {
