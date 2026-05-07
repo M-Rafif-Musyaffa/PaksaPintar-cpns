@@ -168,7 +168,7 @@ export default function SettingScreen({ onMulai }: { onMulai: () => void }) {
         
         {/* AREA TOMBOL BAWAH */}
         <div className="flex gap-3 mt-2">
-          {/* Tombol Keluar (Baru) */}
+          {/* Tombol Keluar*/}
           <button 
             onClick={handleKeluar}
             className="bg-brutal-pink text-brutal-black font-black px-5 py-4 border-4 border-brutal-black hover:bg-white shadow-[4px_4px_0_0_#1e1e1e] transition-all hover:translate-x-1 hover:-translate-y-1 text-xl"
