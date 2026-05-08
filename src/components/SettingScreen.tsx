@@ -16,7 +16,6 @@ export default function SettingScreen({ onMulai }: { onMulai: () => void }) {
   const [isCustomMode, setIsCustomMode] = useState(false);
   const [customMenit, setCustomMenit] = useState(15); 
   const [showKelola, setShowKelola] = useState(false);
-
   const allSoal = [...dataSoalBawaan, ...customSoal];
   const countTWK = allSoal.filter(s => s.kategori.toUpperCase().includes('TWK')).length;
   const countTIU = allSoal.filter(s => s.kategori.toUpperCase().includes('TIU')).length;
