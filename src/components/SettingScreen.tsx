@@ -96,8 +96,7 @@ export default function SettingScreen({ onMulai }: { onMulai: () => void }) {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col items-center justify-center p-4 border-[8px] border-brutal-black bg-brutal-bg selection:bg-brutal-pink">
-      
+    <div className="h-screen w-screen flex flex-col items-center justify-center p-4 border-[8px] border-brutal-black bg-brutal-bg selection:bg-brutal-pink">    
       <div className="bg-white border-4 border-brutal-black p-6 shadow-[8px_8px_0_0_#1e1e1e] max-w-md w-full flex flex-col gap-6">
         
         <div className="bg-brutal-yellow p-3 border-4 border-brutal-black text-center relative shadow-sm">
