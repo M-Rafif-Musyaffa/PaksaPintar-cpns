@@ -7,13 +7,15 @@ export default function SettingScreen({ onMulai }: { onMulai: () => void }) {
   const { 
     waktuMuncul, setWaktuMuncul, 
     kategoriAktif, setKategoriAktif, 
-    importSoalBaru, customSoal 
+    importSoalBaru, customSoal,
+    hapusSoalCustom, hapusSemuaSoalCustom 
   } = useSoalStore();
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isCustomMode, setIsCustomMode] = useState(false);
   const [customMenit, setCustomMenit] = useState(15); 
+  const [showKelola, setShowKelola] = useState(false);
 
   const allSoal = [...dataSoalBawaan, ...customSoal];
   const countTWK = allSoal.filter(s => s.kategori.toUpperCase().includes('TWK')).length;
@@ -104,17 +106,25 @@ export default function SettingScreen({ onMulai }: { onMulai: () => void }) {
 
         <div className="flex items-center justify-between bg-gray-100 border-4 border-brutal-black p-2">
           <div className="flex gap-2 text-xs font-black uppercase">
-            <span className="bg-brutal-pink border-2 border-brutal-black px-2 py-1" title="TWK">T:{countTWK}</span>
-            <span className="bg-brutal-blue text-white border-2 border-brutal-black px-2 py-1" title="TIU">I:{countTIU}</span>
-            <span className="bg-brutal-yellow border-2 border-brutal-black px-2 py-1" title="TKP">K:{countTKP}</span>
+            <span className="bg-brutal-pink border-2 border-brutal-black px-2 py-1" title="TWK">Twk:{countTWK}</span>
+            <span className="bg-brutal-blue text-white border-2 border-brutal-black px-2 py-1" title="TIU">Tiu:{countTIU}</span>
+            <span className="bg-brutal-yellow border-2 border-brutal-black px-2 py-1" title="TKP">Tkp:{countTKP}</span>
           </div>
           
-          <button 
-            onClick={() => fileInputRef.current?.click()}
-            className="bg-brutal-black text-white text-xs font-black uppercase tracking-wider px-3 py-1.5 border-2 border-transparent hover:bg-white hover:text-brutal-black hover:border-brutal-black transition-colors"
-          >
-            + Import JSON
-          </button>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => fileInputRef.current?.click()}
+              className="flex-1 bg-brutal-black text-white text-xs font-black uppercase py-2 border-2 border-transparent hover:bg-white hover:text-brutal-black hover:border-brutal-black transition-colors"
+            >
+              + Import (.json)
+            </button>
+            <button 
+              onClick={() => setShowKelola(true)}
+              className="flex-1 bg-white text-brutal-black text-xs font-black uppercase py-2 border-2 border-brutal-black hover:bg-brutal-pink transition-colors"
+            >
+              ⚙️ Kelola ({customSoal.length})
+            </button>
+          </div>
           <input type="file" accept=".json" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
         </div>
 
@@ -187,6 +197,56 @@ export default function SettingScreen({ onMulai }: { onMulai: () => void }) {
         </div>
 
       </div>
+      {/* MODAL KELOLA SOAL*/}
+      {showKelola && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 animate-[fadeIn_0.2s_ease-out]">
+          <div className="bg-white border-[6px] border-brutal-black w-full max-w-lg h-[80vh] flex flex-col shadow-[8px_8px_0_0_#1e1e1e]">
+            
+            <div className="bg-brutal-yellow border-b-4 border-brutal-black p-4 flex justify-between items-center shrink-0">
+              <h2 className="font-black text-lg uppercase tracking-tighter">⚙️ Kelola Soal Import</h2>
+              <button onClick={() => setShowKelola(false)} className="font-black text-2xl hover:text-brutal-pink transition-colors">❌</button>
+            </div>
+            
+            <div className="p-4 overflow-y-auto flex-1 flex flex-col gap-3 bg-gray-50">
+              {customSoal.length === 0 ? (
+                <div className="text-center font-bold text-gray-500 py-10">Belum ada soal tambahan yang di-import.</div>
+              ) : (
+                customSoal.map((soal, idx) => (
+                  <div key={idx} className="bg-white border-4 border-brutal-black p-3 relative group">
+                    <span className="absolute -top-3 -left-3 bg-brutal-blue text-white text-xs font-black px-2 py-1 border-2 border-brutal-black shadow-sm">#{idx + 1} | {soal.kategori}</span>
+                    <p className="font-bold text-sm mt-3 line-clamp-3 text-gray-800">{soal.pertanyaan}</p>
+                    
+                    <div className="mt-3 text-right border-t-2 border-dashed border-gray-300 pt-2">
+                      <button 
+                        onClick={() => {
+                          if(window.confirm('Hapus soal ini?')) hapusSoalCustom(idx);
+                        }}
+                        className="bg-brutal-pink text-brutal-black font-black text-xs px-3 py-1.5 border-2 border-brutal-black shadow-[2px_2px_0_0_#1e1e1e] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
+                      >
+                        🗑️ Hapus Soal
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {customSoal.length > 0 && (
+              <div className="p-4 border-t-4 border-brutal-black bg-white shrink-0">
+                <button 
+                  onClick={() => {
+                    if(window.confirm('⚠️ PERINGATAN: Yakin ingin menghapus SEMUA soal yang telah kamu import?')) hapusSemuaSoalCustom();
+                  }}
+                  className="w-full bg-brutal-black text-white font-black py-3 border-4 border-brutal-black hover:bg-brutal-pink hover:text-brutal-black transition-colors uppercase tracking-widest text-sm"
+                >
+                  ⚠️ Hapus Semua Soal
+                </button>
+              </div>
+            )}
+            
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -33,6 +33,8 @@ interface SoalState {
   clearCache: () => void;
   tambahSkor: (isBenar: boolean, soalObj: Soal) => void;
   importSoalBaru: (soalBaru: Soal[]) => void;
+  hapusSoalCustom: (index: number) => void;
+  hapusSemuaSoalCustom: () => void;
 }
 
 const shuffleArray = (array: Soal[]) => {
@@ -88,6 +90,16 @@ export const useSoalStore = create<SoalState>()(
           };
         });
       },
+
+      hapusSoalCustom: (index: number) => {
+        set((state) => {
+          const customBaru = [...state.customSoal];
+          customBaru.splice(index, 1); // Hapus 1 item berdasarkan urutannya
+          return { customSoal: customBaru };
+        });
+      },
+
+      hapusSemuaSoalCustom: () => set({ customSoal: [] }),
 
       initSoal: () => {
         const { kategoriAktif, customSoal } = get();
