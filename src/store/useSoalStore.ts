@@ -9,6 +9,7 @@ export type Soal = {
   pilihan: string[];
   jawaban_benar: string;
   pembahasan: string;
+  skor_tkp?: Record<string, number>;
 };
 
 interface SoalState {
@@ -20,6 +21,7 @@ interface SoalState {
   
   skorBenar: number;
   skorSalah: number;
+  totalSkorTKP: number;
   totalDijawab: number;
   isSelesai: boolean;
   
@@ -31,7 +33,7 @@ interface SoalState {
   initSoal: () => void;
   getNextSoal: () => void;
   clearCache: () => void;
-  tambahSkor: (isBenar: boolean, soalObj: Soal) => void;
+  tambahSkor: (opsiTerpilih: string, soalObj: Soal) => void;
   importSoalBaru: (soalBaru: Soal[]) => void;
   hapusSoalCustom: (index: number) => void;
   hapusSemuaSoalCustom: () => void;
@@ -58,6 +60,7 @@ export const useSoalStore = create<SoalState>()(
 
       skorBenar: 0,
       skorSalah: 0,
+      totalSkorTKP: 0,
       totalDijawab: 0,
       isSelesai: false,
       
@@ -67,28 +70,35 @@ export const useSoalStore = create<SoalState>()(
       setWaktuMuncul: (ms: number) => set({ waktuMuncul: ms }),
       setKategoriAktif: (kategori: string) => set({ kategoriAktif: kategori }),
 
-      tambahSkor: (isBenar: boolean, soalObj: Soal) => {
-        set((state) => ({
-          skorBenar: isBenar ? state.skorBenar + 1 : state.skorBenar,
-          skorSalah: !isBenar ? state.skorSalah + 1 : state.skorSalah,
-          totalDijawab: state.totalDijawab + 1,
-          logSalah: !isBenar ? [...state.logSalah, soalObj] : state.logSalah, 
-        }));
+      tambahSkor: (opsiTerpilih: string, soalObj: Soal) => {
+        set((state) => {
+          const isTKP = soalObj.kategori.toUpperCase().includes('TKP');
+          let poinTKP = 0;
+          let isJawabanMaksimal = false;
+
+          if (isTKP) {
+            // Ambil skor dari JSON (jika ada), jika JSON format lama anggap yg benar = 5
+            poinTKP = soalObj.skor_tkp ? (soalObj.skor_tkp[opsiTerpilih] || 1) : (opsiTerpilih === soalObj.jawaban_benar ? 5 : 0);
+            isJawabanMaksimal = poinTKP === 5; // Hanya lolos hukuman jika mendapat poin 5
+          } else {
+            isJawabanMaksimal = opsiTerpilih === soalObj.jawaban_benar;
+          }
+
+          return {
+            skorBenar: !isTKP && isJawabanMaksimal ? state.skorBenar + 1 : state.skorBenar,
+            skorSalah: !isTKP && !isJawabanMaksimal ? state.skorSalah + 1 : state.skorSalah,
+            totalSkorTKP: isTKP ? state.totalSkorTKP + poinTKP : state.totalSkorTKP,
+            totalDijawab: state.totalDijawab + 1,
+            logSalah: !isJawabanMaksimal ? [...state.logSalah, soalObj] : state.logSalah, 
+          };
+        });
       },
 
       importSoalBaru: (soalBaru: Soal[]) => {
-       set((state) => {
-          const pertanyaanSudahAda = new Set(
-            [...dataSoalBawaan, ...state.customSoal].map(s => 
-              s.pertanyaan.trim().toLowerCase() 
-            )
-          );
-          const soalUnik = soalBaru.filter(soal => 
-            !pertanyaanSudahAda.has(soal.pertanyaan.trim().toLowerCase())
-          );
-          return {
-            customSoal: [...state.customSoal, ...soalUnik]
-          };
+        set((state) => {
+          const pertanyaanSudahAda = new Set([...dataSoalBawaan, ...state.customSoal].map(s => s.pertanyaan.trim().toLowerCase()));
+          const soalUnik = soalBaru.filter(soal => !pertanyaanSudahAda.has(soal.pertanyaan.trim().toLowerCase()));
+          return { customSoal: [...state.customSoal, ...soalUnik] };
         });
       },
 
@@ -101,7 +111,7 @@ export const useSoalStore = create<SoalState>()(
       },
 
       hapusSemuaSoalCustom: () => set({ customSoal: [] }),
-      
+
       hapusSoalCustomByKategori: (kategori: string) => {
         set((state) => ({
           // Filter: Simpan soal yang kategorinya TIDAK SAMA dengan kategori yang mau dihapus

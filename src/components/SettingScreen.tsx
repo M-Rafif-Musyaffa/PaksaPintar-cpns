@@ -8,14 +8,14 @@ export default function SettingScreen({ onMulai }: { onMulai: () => void }) {
     waktuMuncul, setWaktuMuncul, 
     kategoriAktif, setKategoriAktif, 
     importSoalBaru, customSoal,
-    hapusSoalCustom, hapusSemuaSoalCustom, hapusSoalCustomByKategori 
+    hapusSoalCustom, hapusSemuaSoalCustom, hapusSoalCustomByKategori
   } = useSoalStore();
   
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const [isCustomMode, setIsCustomMode] = useState(false);
   const [customMenit, setCustomMenit] = useState(15); 
   const [showKelola, setShowKelola] = useState(false);
+
   const allSoal = [...dataSoalBawaan, ...customSoal];
   const countTWK = allSoal.filter(s => s.kategori.toUpperCase().includes('TWK')).length;
   const countTIU = allSoal.filter(s => s.kategori.toUpperCase().includes('TIU')).length;
@@ -30,26 +30,16 @@ export default function SettingScreen({ onMulai }: { onMulai: () => void }) {
   }, [waktuMuncul]);
 
   const handleMulai = async () => {
-    if (waktuMuncul < 1000) {
-      alert("💀 Waktu terlalu singkat! Minimal 1 detik.");
-      return;
-    }
+    if (waktuMuncul < 1000) { alert("💀 Waktu terlalu singkat!"); return; }
     onMulai(); 
     try {
       await invoke('sembunyikan_jendela');
-      setTimeout(async () => {
-        await invoke('munculkan_jendela');
-      }, waktuMuncul);
+      setTimeout(async () => { await invoke('munculkan_jendela'); }, waktuMuncul);
     } catch (err) { console.error(err); }
   };
 
-  // FUNGSI UNTUK MEMATIKAN APLIKASI SEPENUHNYA
   const handleKeluar = async () => {
-    try {
-      await invoke('matikan_aplikasi');
-    } catch (err) { 
-      console.error(err); 
-    }
+    try { await invoke('matikan_aplikasi'); } catch (err) { console.error(err); }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,15 +51,10 @@ export default function SettingScreen({ onMulai }: { onMulai: () => void }) {
       try {
         const jsonTeks = event.target?.result as string;
         const dataBaru = JSON.parse(jsonTeks);
-        
-        if (Array.isArray(dataBaru) && dataBaru.length > 0 && dataBaru[0].pertanyaan) {       
+        if (Array.isArray(dataBaru) && dataBaru.length > 0 && dataBaru[0].pertanyaan) {
           importSoalBaru(dataBaru);
-          setTimeout(() => {
-            alert(`✅ PROSES SELESAI!\nSistem memfilter soal duplikat secara otomatis. Cek jumlah total soalmu sekarang.`);
-          }, 100);
-        } else {
-          alert("💀 GAGAL! Format JSON salah.");
-        }
+          setTimeout(() => alert(`✅ BERHASIL!\nSoal ditambahkan (duplikat diabaikan otomatis).`), 100);
+        } else { alert("💀 GAGAL! Format JSON salah."); }
       } catch (err) { alert("💀 ERROR! File JSON rusak."); }
     };
     reader.readAsText(file);
@@ -95,146 +80,149 @@ export default function SettingScreen({ onMulai }: { onMulai: () => void }) {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col items-center justify-center p-4 border-[8px] border-brutal-black bg-brutal-bg selection:bg-brutal-pink">    
-      <div className="bg-white border-4 border-brutal-black p-6 shadow-[8px_8px_0_0_#1e1e1e] max-w-md w-full flex flex-col gap-6">
+    <div className="h-screen w-screen flex flex-col items-center justify-center p-3 bg-brutal-bg selection:bg-brutal-pink overflow-hidden">
+      
+      {/* KOTAK UTAMA (Diperkecil max-w-md, padding dikurangi) */}
+      <div className="bg-white border-4 border-brutal-black shadow-[8px_8px_0_0_#1e1e1e] max-w-md w-full flex flex-col relative z-10 animate-[fadeIn_0.3s_ease-out] max-h-full overflow-y-auto">
         
-        <div className="bg-brutal-yellow p-3 border-4 border-brutal-black text-center relative shadow-sm">
-          <h1 className="text-3xl font-black uppercase tracking-tight">PAKSAPINTAR Cpns</h1>
+        {/* 1. HEADER (Lebih ringkas) */}
+        <div className="bg-brutal-yellow p-3 border-b-4 border-brutal-black text-center relative overflow-hidden shrink-0">
+          <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#000 2px, transparent 2px)', backgroundSize: '16px 16px' }}></div>
+          <h1 className="text-3xl font-black uppercase tracking-tighter drop-shadow-sm relative z-10">PAKSAPINTAR 💀</h1>
+          <p className="font-black text-[10px] tracking-[0.1em] uppercase text-brutal-black relative z-10">Teror Belajar CPNS Desktop</p>
         </div>
 
-        <div className="border-4 border-brutal-black bg-gray-50 p-3 flex flex-col gap-3">
-          <h3 className="font-black text-xs text-center uppercase border-b-2 border-brutal-black pb-2 tracking-widest text-gray-700">📊 Statistik Bank Soal</h3>
+        <div className="p-4 flex flex-col gap-4">
           
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="bg-brutal-pink border-2 border-brutal-black py-1.5 flex flex-col">
-              <span className="text-[10px] font-bold uppercase">TWK</span>
-              <span className="font-black text-lg">{countTWK}</span>
+          {/* 2. BLOK DATABASE SOAL (Dibuat Compact) */}
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between items-end mb-1">
+              <h2 className="font-black text-xs uppercase tracking-widest text-gray-800">🗃️ Bank Soal Aktif</h2>
+              <span className="font-black text-[9px] bg-brutal-black text-white px-2 py-1 uppercase tracking-widest">Total: {allSoal.length}</span>
             </div>
-            <div className="bg-brutal-blue text-white border-2 border-brutal-black py-1.5 flex flex-col">
-              <span className="text-[10px] font-bold uppercase">TIU</span>
-              <span className="font-black text-lg">{countTIU}</span>
+            
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="bg-brutal-pink border-2 border-brutal-black py-1.5 shadow-[2px_2px_0_0_#1e1e1e] hover:-translate-y-0.5 transition-transform">
+                <span className="text-[9px] font-black uppercase block text-gray-800">TWK</span>
+                <span className="font-black text-lg">{countTWK}</span>
+              </div>
+              <div className="bg-white border-2 border-brutal-black py-1.5 shadow-[2px_2px_0_0_#1e1e1e] hover:-translate-y-0.5 transition-transform">
+                <span className="text-[9px] font-black uppercase block text-brutal-blue">TIU</span>
+                <span className="font-black text-lg text-brutal-blue">{countTIU}</span>
+              </div>
+              <div className="bg-brutal-yellow border-2 border-brutal-black py-1.5 shadow-[2px_2px_0_0_#1e1e1e] hover:-translate-y-0.5 transition-transform">
+                <span className="text-[9px] font-black uppercase block text-gray-800">TKP</span>
+                <span className="font-black text-lg">{countTKP}</span>
+              </div>
             </div>
-            <div className="bg-brutal-yellow border-2 border-brutal-black py-1.5 flex flex-col">
-              <span className="text-[10px] font-bold uppercase">TKP</span>
-              <span className="font-black text-lg">{countTKP}</span>
+            
+            <div className="flex gap-2 mt-1">
+              <button onClick={() => fileInputRef.current?.click()} className="flex-1 bg-brutal-black text-white text-[11px] font-black uppercase py-2 border-2 border-brutal-black hover:bg-brutal-pink hover:text-brutal-black transition-colors shadow-[2px_2px_0_0_#1e1e1e] active:translate-y-0.5 active:shadow-none">
+                + Import JSON
+              </button>
+              <button onClick={() => setShowKelola(true)} className="flex-1 bg-white text-brutal-black text-[11px] font-black uppercase py-2 border-2 border-brutal-black hover:bg-gray-200 transition-colors shadow-[2px_2px_0_0_#1e1e1e] active:translate-y-0.5 active:shadow-none">
+                ⚙️ Kelola ({customSoal.length})
+              </button>
+              <input type="file" accept=".json" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
             </div>
           </div>
+
+          {/* 3. BLOK KONFIGURASI TEROR */}
+          <div className="bg-brutal-blue text-white p-3 border-4 border-brutal-black shadow-[4px_4px_0_0_#1e1e1e] flex flex-col gap-3 relative">
+            <h2 className="font-black text-xs uppercase tracking-widest border-b-2 border-brutal-black pb-1 mb-1 text-brutal-yellow">⚙️ Konfigurasi Teror</h2>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="font-black block mb-1 text-[9px] uppercase tracking-widest">⏱️ Interval Muncul:</label>
+                <select className="w-full border-2 border-brutal-black p-1.5 bg-white text-brutal-black font-black cursor-pointer hover:bg-gray-200 focus:outline-none text-xs" value={isCustomMode ? 'custom' : waktuMuncul} onChange={handlePilihWaktu}>
+                  <option value={10000}>10 Detik</option>
+                  <option value={30000}>30 Detik</option>
+                  <option value={60000}>1 Menit</option>
+                  <option value={3600000}>1 Jam</option>
+                  <option value={18000000}>5 Jam</option>
+                  <option value="custom">⚙️ Custom...</option>
+                </select>
+              </div>
+              <div>
+                <label className="font-black block mb-1 text-[9px] uppercase tracking-widest">🎯 Target Kategori:</label>
+                <select className="w-full border-2 border-brutal-black p-1.5 bg-white text-brutal-black font-black cursor-pointer hover:bg-gray-200 focus:outline-none text-xs" value={kategoriAktif} onChange={(e) => setKategoriAktif(e.target.value)}>
+                  <option value="SEMUA">🔥 Acak (Semua)</option>
+                  <option value="TIU">Hanya TIU</option>
+                  <option value="TWK">Hanya TWK</option>
+                  <option value="TKP">Hanya TKP</option>
+                </select>
+              </div>
+            </div>
+
+            {isCustomMode && (
+              <div className="flex items-stretch gap-0 mt-1 animate-[slideDown_0.2s_ease-out]">
+                <input type="number" min="1" value={customMenit} onChange={handleUbahCustom} className="w-full border-2 border-r-0 border-brutal-black p-1 text-base text-center font-black text-brutal-black bg-white focus:outline-none focus:bg-brutal-yellow" />
+                <div className="bg-brutal-black text-white font-black px-3 flex items-center border-2 border-brutal-black tracking-widest text-[10px]">MENIT</div>
+              </div>
+            )}
+          </div>
           
+          {/* 4. TOMBOL AKSI */}
           <div className="flex gap-2 mt-1">
-            <button onClick={() => fileInputRef.current?.click()} className="flex-1 bg-brutal-black text-white text-xs font-black uppercase py-2 border-2 border-transparent hover:bg-brutal-pink hover:text-brutal-black transition-colors shadow-sm active:translate-y-0.5">
-              + Import JSON
+            <button onClick={handleKeluar} className="bg-white text-brutal-black font-black px-4 py-3 border-4 border-brutal-black hover:bg-brutal-pink shadow-[4px_4px_0_0_#1e1e1e] transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none text-lg flex items-center justify-center" title="Matikan Aplikasi">
+              ❌
             </button>
-            <button onClick={() => setShowKelola(true)} className="flex-1 bg-white text-brutal-black text-xs font-black uppercase py-2 border-2 border-brutal-black hover:bg-gray-200 transition-colors shadow-[2px_2px_0_0_#1e1e1e] active:translate-y-0.5 active:shadow-none">
-              ⚙️ Kelola ({customSoal.length})
+            <button onClick={handleMulai} className="flex-1 bg-brutal-yellow text-brutal-black font-black py-3 border-4 border-brutal-black hover:bg-white shadow-[4px_4px_0_0_#1e1e1e] transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none text-base uppercase tracking-widest flex items-center justify-center">
+              🔥 MULAI STANDBY
             </button>
-            <input type="file" accept=".json" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
           </div>
+
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="font-bold block mb-1 text-xs uppercase tracking-wider">⏱️ Interval Muncul:</label>
-            <select 
-              className="w-full border-4 border-brutal-black p-2 bg-brutal-bg font-bold cursor-pointer hover:bg-brutal-pink transition-colors focus:outline-none focus:ring-4 focus:ring-brutal-black text-sm" 
-              value={isCustomMode ? 'custom' : waktuMuncul} 
-              onChange={handlePilihWaktu}
-            >
-              <option value={10000}>10 Detik</option>
-              <option value={30000}>30 Detik</option>
-              <option value={60000}>1 Menit</option>
-              <option value={3600000}>1 Jam</option>
-              <option value={18000000}>5 Jam</option>
-              <option value="custom">⚙️ Custom...</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="font-bold block mb-1 text-xs uppercase tracking-wider">🎯 Kategori:</label>
-            <select 
-              className="w-full border-4 border-brutal-black p-2 bg-brutal-bg font-bold cursor-pointer hover:bg-brutal-blue hover:text-white transition-colors focus:outline-none focus:ring-4 focus:ring-brutal-black text-sm" 
-              value={kategoriAktif} 
-              onChange={(e) => setKategoriAktif(e.target.value)}
-            >
-              <option value="SEMUA">Acak (Semua)</option>
-              <option value="TIU">Hanya TIU</option>
-              <option value="TWK">Hanya TWK</option>
-              <option value="TKP">Hanya TKP</option>
-            </select>
-          </div>
-        </div>
-
-        {isCustomMode && (
-          <div className="flex items-stretch gap-2 animate-[slideDown_0.2s_ease-out]">
-            <input 
-              type="number" 
-              min="1"
-              value={customMenit}
-              onChange={handleUbahCustom}
-              className="w-full border-4 border-brutal-black p-2 text-xl text-center font-black focus:outline-none focus:ring-4 focus:ring-brutal-pink selection:bg-brutal-pink"
-              placeholder="15"
-            />
-            <div className="bg-brutal-black text-white font-black px-4 flex items-center justify-center border-4 border-brutal-black tracking-widest uppercase text-xs">
-              Menit
-            </div>
-          </div>
-        )}
-        
-        {/* AREA TOMBOL BAWAH */}
-        <div className="flex gap-3 mt-2">
-          {/* Tombol Keluar*/}
-          <button 
-            onClick={handleKeluar}
-            className="bg-brutal-pink text-brutal-black font-black px-5 py-4 border-4 border-brutal-black hover:bg-white shadow-[4px_4px_0_0_#1e1e1e] transition-all hover:translate-x-1 hover:-translate-y-1 text-xl"
-            title="Keluar dari Aplikasi"
-          >
-            ❌
-          </button>
-          
-          {/* Tombol Mulai */}
-          <button 
-            onClick={handleMulai} 
-            className="flex-1 bg-brutal-black text-white font-black py-4 border-4 border-brutal-black hover:bg-brutal-yellow hover:text-brutal-black hover:translate-x-1 hover:-translate-y-1 shadow-[4px_4px_0_0_#1e1e1e] transition-all tracking-widest text-lg uppercase"
-          >
-            🔥 Mulai Standby
-          </button>
+        {/* 5. FOOTER COPYRIGHT (Sekarang ada di dalam kotak agar menghemat ruang) */}
+        <div className="bg-gray-100 border-t-4 border-brutal-black p-2 text-center shrink-0">
+          <p className="font-black text-[9px] uppercase tracking-widest text-gray-500">
+            © 2026 <span className="mx-1">|</span> M. Rafif Musyaffa
+          </p>
         </div>
 
       </div>
-      {/* MODAL KELOLA SOAL*/}
+
+      {/* MODAL KELOLA SOAL (Ukuran disesuaikan) */}
       {showKelola && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 animate-[fadeIn_0.2s_ease-out]">
-          <div className="bg-white border-[6px] border-brutal-black w-full max-w-lg h-[85vh] flex flex-col shadow-[8px_8px_0_0_#1e1e1e]">
+        <div className="fixed inset-0 bg-brutal-black/90 z-50 flex items-center justify-center p-3 animate-[fadeIn_0.2s_ease-out]">
+          <div className="bg-white border-4 border-brutal-black w-full max-w-lg h-[85vh] max-h-[600px] flex flex-col shadow-[8px_8px_0_0_#brutal-pink]">
             
-            <div className="bg-brutal-yellow border-b-4 border-brutal-black p-4 flex justify-between items-center shrink-0">
-              <h2 className="font-black text-lg uppercase tracking-tighter">⚙️ Kelola Soal Import</h2>
-              <button onClick={() => setShowKelola(false)} className="font-black text-2xl hover:text-brutal-pink transition-colors">❌</button>
+            <div className="bg-brutal-pink border-b-4 border-brutal-black p-3 flex justify-between items-center shrink-0">
+              <h2 className="font-black text-sm uppercase tracking-widest">⚙️ Kelola Soal Import</h2>
+              <button onClick={() => setShowKelola(false)} className="font-black text-lg hover:text-white transition-colors">❌</button>
             </div>
             
-            <div className="p-4 overflow-y-auto flex-1 flex flex-col gap-3 bg-gray-50">
+            <div className="p-3 overflow-y-auto flex-1 flex flex-col gap-3 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-gray-50">
               
-              {/* TOMBOL HAPUS BERDASARKAN KATEGORI */}
+              {/* AKSI CEPAT HAPUS KATEGORI */}
               {customSoal.length > 0 && (
-                <div className="mb-2 border-b-4 border-dashed border-gray-300 pb-4">
-                  <p className="font-bold text-xs mb-2 uppercase text-gray-500 tracking-widest">Aksi Cepat (Hapus Kategori):</p>
-                  <div className="flex gap-2 overflow-x-auto pb-1">
-                    <button onClick={() => window.confirm('Hapus SEMUA soal custom TWK?') && hapusSoalCustomByKategori('TWK')} className="bg-brutal-pink text-brutal-black text-xs font-black px-3 py-2 border-2 border-brutal-black shadow-[2px_2px_0_0_#1e1e1e] active:shadow-none active:translate-y-0.5 whitespace-nowrap">🗑️ Hapus TWK</button>
-                    <button onClick={() => window.confirm('Hapus SEMUA soal custom TIU?') && hapusSoalCustomByKategori('TIU')} className="bg-brutal-blue text-white text-xs font-black px-3 py-2 border-2 border-brutal-black shadow-[2px_2px_0_0_#1e1e1e] active:shadow-none active:translate-y-0.5 whitespace-nowrap">🗑️ Hapus TIU</button>
-                    <button onClick={() => window.confirm('Hapus SEMUA soal custom TKP?') && hapusSoalCustomByKategori('TKP')} className="bg-brutal-yellow text-brutal-black text-xs font-black px-3 py-2 border-2 border-brutal-black shadow-[2px_2px_0_0_#1e1e1e] active:shadow-none active:translate-y-0.5 whitespace-nowrap">🗑️ Hapus TKP</button>
+                <div className="bg-white border-2 border-brutal-black p-2 shadow-sm mb-1">
+                  <p className="font-black text-[9px] mb-2 uppercase text-gray-500 tracking-widest border-b border-gray-300 pb-1">Aksi Cepat Hapus:</p>
+                  <div className="flex gap-2 overflow-x-auto">
+                    <button onClick={() => window.confirm('Hapus SEMUA custom TWK?') && hapusSoalCustomByKategori('TWK')} className="bg-brutal-pink text-brutal-black text-[10px] font-black px-3 py-1.5 border-2 border-brutal-black hover:bg-white transition-colors flex-1 whitespace-nowrap">🗑️ TWK</button>
+                    <button onClick={() => window.confirm('Hapus SEMUA custom TIU?') && hapusSoalCustomByKategori('TIU')} className="bg-brutal-blue text-white text-[10px] font-black px-3 py-1.5 border-2 border-brutal-black hover:bg-white hover:text-brutal-black transition-colors flex-1 whitespace-nowrap">🗑️ TIU</button>
+                    <button onClick={() => window.confirm('Hapus SEMUA custom TKP?') && hapusSoalCustomByKategori('TKP')} className="bg-brutal-yellow text-brutal-black text-[10px] font-black px-3 py-1.5 border-2 border-brutal-black hover:bg-white transition-colors flex-1 whitespace-nowrap">🗑️ TKP</button>
                   </div>
                 </div>
               )}
 
+              {/* DAFTAR SOAL */}
               {customSoal.length === 0 ? (
-                <div className="text-center font-bold text-gray-500 py-10 border-4 border-dashed border-gray-300">Belum ada soal tambahan yang di-import.</div>
+                <div className="text-center font-black text-gray-400 py-12 border-2 border-dashed border-gray-300 bg-white text-xs">
+                  KOSONG.<br/>BELUM ADA SOAL IMPORT.
+                </div>
               ) : (
                 customSoal.map((soal, idx) => (
-                  <div key={idx} className="bg-white border-4 border-brutal-black p-3 relative group">
-                    <span className="absolute -top-3 -left-3 bg-brutal-blue text-white text-xs font-black px-2 py-1 border-2 border-brutal-black shadow-sm">#{idx + 1} | {soal.kategori}</span>
-                    <p className="font-bold text-sm mt-3 line-clamp-3 text-gray-800">{soal.pertanyaan}</p>
+                  <div key={idx} className="bg-white border-2 border-brutal-black p-3 relative group">
+                    <span className="absolute -top-2 -left-2 bg-brutal-black text-white text-[9px] font-black px-2 py-0.5 border-2 border-brutal-black uppercase tracking-widest">
+                      #{idx + 1} | {soal.kategori}
+                    </span>
+                    <p className="font-bold text-xs mt-2 line-clamp-3 text-gray-800 bg-gray-100 p-2 border-l-2 border-brutal-black leading-relaxed">{soal.pertanyaan}</p>
                     
-                    <div className="mt-3 text-right border-t-2 border-dashed border-gray-300 pt-2">
-                      <button onClick={() => window.confirm('Hapus soal ini?') && hapusSoalCustom(idx)} className="bg-brutal-pink text-brutal-black font-black text-xs px-3 py-1.5 border-2 border-brutal-black shadow-[2px_2px_0_0_#1e1e1e] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all">
-                        🗑️ Hapus Satuan
+                    <div className="mt-2 text-right">
+                      <button onClick={() => window.confirm('Hapus soal ini?') && hapusSoalCustom(idx)} className="bg-brutal-pink text-brutal-black font-black text-[10px] px-3 py-1.5 border-2 border-brutal-black shadow-sm hover:bg-white transition-colors uppercase tracking-widest">
+                        🗑️ Hapus
                       </button>
                     </div>
                   </div>
@@ -242,11 +230,11 @@ export default function SettingScreen({ onMulai }: { onMulai: () => void }) {
               )}
             </div>
 
-            {/* HAPUS SEMUANYA */}
+            {/* HAPUS SEMUA */}
             {customSoal.length > 0 && (
-              <div className="p-4 border-t-4 border-brutal-black bg-white shrink-0">
-                <button onClick={() => window.confirm('⚠️ PERINGATAN: Yakin ingin menghapus SEMUA soal import secara total?') && hapusSemuaSoalCustom()} className="w-full bg-brutal-black text-white font-black py-3 border-4 border-brutal-black hover:bg-brutal-pink hover:text-brutal-black transition-colors uppercase tracking-widest text-sm">
-                  ⚠️ Hapus Semua Soal
+              <div className="p-3 border-t-4 border-brutal-black bg-white shrink-0">
+                <button onClick={() => window.confirm('⚠️ PERINGATAN: Yakin ingin menghapus SEMUA soal import secara total?') && hapusSemuaSoalCustom()} className="w-full bg-brutal-black text-white font-black py-3 border-2 border-brutal-black hover:bg-brutal-pink hover:text-brutal-black transition-colors uppercase tracking-widest text-xs">
+                  ⚠️ HANCURKAN SEMUA SOAL IMPORT
                 </button>
               </div>
             )}
@@ -254,6 +242,7 @@ export default function SettingScreen({ onMulai }: { onMulai: () => void }) {
           </div>
         </div>
       )}
+
     </div>
   );
 }
