@@ -35,6 +35,7 @@ interface SoalState {
   importSoalBaru: (soalBaru: Soal[]) => void;
   hapusSoalCustom: (index: number) => void;
   hapusSemuaSoalCustom: () => void;
+  hapusSoalCustomByKategori: (kategori: string) => void;
 }
 
 const shuffleArray = (array: Soal[]) => {
@@ -100,6 +101,15 @@ export const useSoalStore = create<SoalState>()(
       },
 
       hapusSemuaSoalCustom: () => set({ customSoal: [] }),
+      
+      hapusSoalCustomByKategori: (kategori: string) => {
+        set((state) => ({
+          // Filter: Simpan soal yang kategorinya TIDAK SAMA dengan kategori yang mau dihapus
+          customSoal: state.customSoal.filter(
+            s => !s.kategori.toUpperCase().includes(kategori.toUpperCase())
+          )
+        }));
+      },
 
       initSoal: () => {
         const { kategoriAktif, customSoal } = get();
